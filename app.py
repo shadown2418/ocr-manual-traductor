@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz  # PyMuPDF
 from PIL import Image
-import pytesseract
+import easyocr
 from translate import Translator
 from docx import Document
 from io import BytesIO
@@ -16,7 +16,7 @@ imagenes = []
 
 if uploaded_file:
     if uploaded_file.type == "application/pdf":
-        uploaded_file.seek(0)  # Corrección importante
+        uploaded_file.seek(0)
         with st.spinner("Convirtiendo PDF a imágenes..."):
             doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
             for page in doc:
@@ -27,10 +27,13 @@ if uploaded_file:
         imagen = Image.open(uploaded_file).convert("RGB")
         imagenes = [imagen]
 
+    reader = easyocr.Reader(['en', 'es'], gpu=False)
+
     texto_extraido = ""
     with st.spinner("Aplicando OCR..."):
         for i, image in enumerate(imagenes):
-            texto = pytesseract.image_to_string(image)
+            resultados = reader.readtext(image, detail=0)
+            texto = "\n".join(resultados)
             texto_extraido += f"\n\n--- Página {i+1} ---\n\n{texto}"
 
     try:
