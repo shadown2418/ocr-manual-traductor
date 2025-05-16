@@ -1,0 +1,7 @@
+streamlit
+pytesseract
+pillow
+python-docx
+translate
+PyMuPDF
+langdetect
